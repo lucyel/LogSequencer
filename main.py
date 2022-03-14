@@ -6,7 +6,11 @@ import urllib3
 
 from yaml.loader import SafeLoader
 from elasticsearch import Elasticsearch
-#from elasticsearch.helpers import bulk
+from flask import Flask, request, abort
+
+
+# TODO: web interface for tools
+# TODO: Make function to convert anytime format to usable time format.
 
 urllib3.disable_warnings()
 
@@ -26,6 +30,9 @@ def check_indices(indices):
 def create_index(indices, request_body):
     es.indices.create(index=indices, body=request_body)
 
+
+# TODO: add more search type
+# TODO: web interface need a list of type to use
 
 
 def search_query(index, key, value, value_must_exsists, gte, lte, querytype='match', size=10):
@@ -64,67 +71,70 @@ es = init_connection(f"{vari['elastic_authen']['host']}", f"{vari['elastic_authe
 
 
 
-body = []
+# body = []
 #
 # for i in range(len(count_chain("args"))):
 #     body_temp = convert_args_to_json("args")
 #     body_temp_copy = body_temp.copy()
 #     body.append(body_temp_copy)
 
-body0 = {
-    "inputKeyword": "user.name",
-    "inputValue": "DESKTOP-4R0S3HP\mio",
-    "inputIndices": "auditbeat-*",
-    "outputKeyword": "process.name",
-    "gte": "now-1y",
-    "lte": "now"
-}
+# body0 = {
+#     "inputKeyword": "user.name",
+#     "inputValue": "DESKTOP-4R0S3HP\mio",
+#     "inputIndices": "auditbeat-*",
+#     "outputKeyword": "process.name",
+#     "gte": "now-1y",
+#     "lte": "now"
+# }
+#
+# body0_copy = body0.copy()
+# body.append(body0_copy)
+#
+# body1 = {
+#     "inputIndices": "winlogbeat-*",
+#     "outputKeyword": "event.code",
+#     "gte": "now-1y",
+#     "lte": "now"
+# }
+#
+# body1_copy = body1.copy()
+# body.append(body1_copy)
+#
+#
+# body2 = {
+#     "inputIndices": "winlogbeat-*",
+#     "outputKeyword": "winlog.event_data.QueryName",
+#     "gte": "now-1y",
+#     "lte": "now"
+# }
+#
+# body2_copy = body2.copy()
+# body.append(body2_copy)
+#
+# body3 = {
+#     "inputIndices": "winlogbeat-*",
+#     "outputKeyword": "winlog.event_data.ProcessId",
+#     "gte": "now-1y",
+#     "lte": "now"
+# }
+#
+# body3_copy = body3.copy()
+# body.append(body3_copy)
+#
+# body4 = {
+#     "inputIndices": "winlogbeat-*",
+#     "outputKeyword": "winlog.event_data.Image",
+#     "gte": "now-1y",
+#     "lte": "now"
+# }
+#
+# body4_copy = body4.copy()
+# body.append(body4_copy)
+#
+# print(body)
+#
 
-body0_copy = body0.copy()
-body.append(body0_copy)
-
-body1 = {
-    "inputIndices": "winlogbeat-*",
-    "outputKeyword": "event.code",
-    "gte": "now-1y",
-    "lte": "now"
-}
-
-body1_copy = body1.copy()
-body.append(body1_copy)
-
-
-body2 = {
-    "inputIndices": "winlogbeat-*",
-    "outputKeyword": "winlog.event_data.QueryName",
-    "gte": "now-1y",
-    "lte": "now"
-}
-
-body2_copy = body2.copy()
-body.append(body2_copy)
-
-body3 = {
-    "inputIndices": "winlogbeat-*",
-    "outputKeyword": "winlog.event_data.ProcessId",
-    "gte": "now-1y",
-    "lte": "now"
-}
-
-body3_copy = body3.copy()
-body.append(body3_copy)
-
-body4 = {
-    "inputIndices": "winlogbeat-*",
-    "outputKeyword": "winlog.event_data.Image",
-    "gte": "now-1y",
-    "lte": "now"
-}
-
-body4_copy = body4.copy()
-body.append(body4_copy)
-
-def main():
+def search(body):
     result_list = []
     output_res = []
     output_res_temp = []
@@ -192,5 +202,17 @@ def main():
         if output_res[i]:
             print(output_res[i])
 
-if __name__ == "__main__":
-    main()
+
+app = Flask(__name__)
+@app.route('/request', methods=['POST', 'GET'])
+def get_webhook():
+    if request.method == 'POST':
+        body = [request.json]
+        search(body)
+        return 'success', 200
+    else:
+        abort(400)
+
+
+if __name__ == '__main__':
+    app.run()
