@@ -71,13 +71,13 @@ es = init_connection(f"{vari['elastic_authen']['host']}", f"{vari['elastic_authe
 
 
 
-# body = []
 #
 # for i in range(len(count_chain("args"))):
 #     body_temp = convert_args_to_json("args")
 #     body_temp_copy = body_temp.copy()
 #     body.append(body_temp_copy)
 
+# body = []
 # body0 = {
 #     "inputKeyword": "user.name",
 #     "inputValue": "DESKTOP-4R0S3HP\mio",
@@ -132,7 +132,9 @@ es = init_connection(f"{vari['elastic_authen']['host']}", f"{vari['elastic_authe
 # body.append(body4_copy)
 #
 # print(body)
-#
+
+
+#body format [{}, {}, {}]
 
 def search(body):
     result_list = []
@@ -141,7 +143,7 @@ def search(body):
     count_field = 0
     search_type = "query_string"
 
-    for args_value in range(0,5):
+    for args_value in range(len(body)):
         if args_value == 0:
             input_result = search_query(body[args_value]['inputIndices'], body[args_value]['inputKeyword'], body[args_value]['inputValue'],
                                         body[args_value]['outputKeyword'],
@@ -216,3 +218,4 @@ def get_webhook():
 
 if __name__ == '__main__':
     app.run()
+    # search(body)
