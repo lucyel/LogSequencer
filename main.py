@@ -1,6 +1,7 @@
 import re
 import yaml
 import urllib3
+import logging
 #import requests
 
 
@@ -183,7 +184,7 @@ app = Flask(__name__)
 def get_webhook():
     if request.method == 'POST':
         body = request.json
-        result = search(body['body'])
+        result = {"res": search(body['body'])}
         return str(result), 200
     else:
         abort(400)
@@ -192,7 +193,8 @@ def get_webhook():
 if __name__ == '__main__':
     es = init_connection(f"{vari['elastic_authen']['host']}", f"{vari['elastic_authen']['scheme']}",
                          f"{vari['elastic_authen']['idkey']}", f"{vari['elastic_authen']['apikey']}", True, False)
-    app.run()
+    logging.basicConfig(filename='request.log', level=logging.INFO)
+    app.run(host='', port=5602)
     # body = convert_args_to_json("argc")
     # print(body)
     # search(body)
